@@ -31,7 +31,7 @@ async def signup(user:UserCreate,db:Session=Depends(get_db)):
     if check_user:
         raise HTTPException(status_code=400,detail='User already exists')
     hashed_password = hash_password(user.password)
-    new_user = User(username=user.username,password=hashed_password)
+    new_user = User(username=user.username,hashed_password=hashed_password)
     db.add(new_user)
     db.commit()
     db.refresh(new_user)
@@ -45,7 +45,7 @@ async def login(user:UserLogin,db:Session=Depends(get_db)):
     if not check_user:
         raise HTTPException(status_code=400,detail='User not found')
     
-    password_check = verify_password(user.password,check_user.password)
+    password_check = verify_password(user.password,check_user.hashed_password)
 
     if not password_check:
         raise HTTPException(status_code=400,detail='Incorrect password')
